@@ -456,6 +456,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
 	 */
 	protected ResourcePatternResolver getResourcePatternResolver() {
+		//创建一个资源模式解析器（其实就是用来解析xml配置文件）
 		return new PathMatchingResourcePatternResolver(this);
 	}
 
@@ -711,10 +712,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
 		}
-	}
+	}/**
 
-	/**
-	 * Instantiate and register all BeanPostProcessor beans,
+	* Instantiate and register all BeanPostProcessor beans,
 	 * respecting explicit order if given.
 	 * <p>Must be called before any instantiation of application beans.
 	 */
@@ -1123,7 +1123,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	@Override
 	public <T> T getBean(Class<T> requiredType) throws BeansException {
-		assertBeanFactoryActive();
+		assertBeanFactoryActive();//已进入源码
 		return getBeanFactory().getBean(requiredType);
 	}
 
