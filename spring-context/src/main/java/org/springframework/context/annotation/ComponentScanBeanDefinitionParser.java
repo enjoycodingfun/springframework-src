@@ -148,6 +148,11 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			annotationConfig = Boolean.valueOf(element.getAttribute(ANNOTATION_CONFIG_ATTRIBUTE));
 		}
 		if (annotationConfig) {
+			//向容器添加各种beanPsotProcessor（
+			//AutowiredAnnotationBeanPostProcessor
+			//CommonAnnotationBeanPostProcessor
+			//PersistenceAnnotationBeanPostProcessor
+			//RequiredAnnotationBeanPostProcessor等）
 			Set<BeanDefinitionHolder> processorDefinitions =
 					AnnotationConfigUtils.registerAnnotationConfigProcessors(readerContext.getRegistry(), source);
 			for (BeanDefinitionHolder processorDefinition : processorDefinitions) {
