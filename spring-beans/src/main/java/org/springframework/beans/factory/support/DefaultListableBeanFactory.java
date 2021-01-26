@@ -799,8 +799,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
+		// old? 还记得 “允许 bean 覆盖” 这个配置吗？allowBeanDefinitionOverriding
+		// 之后会看到，所有的 Bean 注册后会放入这个 beanDefinitionMap 中
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
+		// 处理重复名称的 Bean 定义的情况
 		if (existingDefinition != null) {
+			// 如果不允许覆盖的话，抛异常
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
 						"Cannot register bean definition [" + beanDefinition + "] for bean '" + beanName +
@@ -809,6 +813,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			else if (existingDefinition.getRole() < beanDefinition.getRole()) {
 				// e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
 				if (logger.isWarnEnabled()) {
+					// log...用框架定义的 Bean 覆盖用户自定义的 Bean
 					logger.warn("Overriding user-defined bean definition for bean '" + beanName +
 							"' with a framework-generated bean definition: replacing [" +
 							existingDefinition + "] with [" + beanDefinition + "]");
@@ -816,6 +821,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			else if (!beanDefinition.equals(existingDefinition)) {
 				if (logger.isInfoEnabled()) {
+					// log...用新的 Bean 覆盖旧的 Bean
 					logger.info("Overriding bean definition for bean '" + beanName +
 							"' with a different definition: replacing [" + existingDefinition +
 							"] with [" + beanDefinition + "]");
@@ -823,14 +829,19 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			else {
 				if (logger.isDebugEnabled()) {
+					// log...用同等的 Bean 覆盖旧的 Bean，这里指的是 equals 方法返回 true 的 Bean
 					logger.debug("Overriding bean definition for bean '" + beanName +
 							"' with an equivalent definition: replacing [" + existingDefinition +
 							"] with [" + beanDefinition + "]");
 				}
 			}
+			// 覆盖
 			this.beanDefinitionMap.put(beanName, beanDefinition);
 		}
 		else {
+			// 判断是否已经有其他的 Bean 开始初始化了.
+			// 注意，"注册Bean" 这个动作结束，Bean 依然还没有初始化，我们后面会有大篇幅说初始化过程，
+			// 在 Spring 容器启动的最后，会 预初始化 所有的 singleton beans
 			if (hasBeanCreationStarted()) {
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
 				synchronized (this.beanDefinitionMap) {
@@ -848,8 +859,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			else {
 				// Still in startup registration phase
+				// 最正常的应该是进到这个分支。
+				// 将 BeanDefinition 放到这个 map 中，这个 map 保存了所有的 BeanDefinition
 				this.beanDefinitionMap.put(beanName, beanDefinition);
+				// 这是个 ArrayList，所以会按照 bean 配置的顺序保存每一个注册的 Bean 的名字
 				this.beanDefinitionNames.add(beanName);
+				// 这是个 LinkedHashSet，代表的是手动注册的 singleton bean，
+				// 注意这里是 remove 方法，到这里的 Bean 当然不是手动注册的
+				// 手动指的是通过调用以下方法注册的 bean ：
+				//     registerSingleton(String beanName, Object singletonObject)
+				// 这不是重点，解释只是为了不让大家疑惑。Spring 会在后面"手动"注册一些 Bean，
+				// 如 "environment"、"systemProperties" 等 bean，我们自己也可以在运行时注册 Bean 到容器中的
 				this.manualSingletonNames.remove(beanName);
 			}
 			this.frozenBeanDefinitionNames = null;

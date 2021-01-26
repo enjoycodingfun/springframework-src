@@ -236,6 +236,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	/**
 	 * Load bean definitions into the given bean factory, typically through
 	 * delegating to one or more bean definition readers.
+	 * 将beandefinations加载进给定的beanfactory，通常通过委派给一个或多个definitipn readers
 	 * @param beanFactory the bean factory to load bean definitions into
 	 * @throws BeansException if parsing of the bean definitions failed
 	 * @throws IOException if loading of bean definition files failed
