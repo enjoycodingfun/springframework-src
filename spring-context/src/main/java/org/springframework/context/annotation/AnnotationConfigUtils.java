@@ -60,6 +60,7 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor
  * @see org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor
  */
+//这个工具类是识别autowired的关键
 public class AnnotationConfigUtils {
 
 	/**
