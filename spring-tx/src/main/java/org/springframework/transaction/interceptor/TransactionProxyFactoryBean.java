@@ -115,7 +115,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 @SuppressWarnings("serial")
 public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBean
 		implements BeanFactoryAware {
-
+	/*
+	这个拦截器通过AOP发挥作用，通过这个拦截器的实现，spring封装了事务处理实现
+	 */
 	private final TransactionInterceptor transactionInterceptor = new TransactionInterceptor();
 
 	@Nullable
