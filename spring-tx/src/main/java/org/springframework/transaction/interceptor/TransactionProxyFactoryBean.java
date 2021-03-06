@@ -129,6 +129,7 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 	 * transaction management: This class is just a way of invoking it.
 	 * @see TransactionInterceptor#setTransactionManager
 	 */
+	//通过依赖注入的PlatformTransactionManager
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionInterceptor.setTransactionManager(transactionManager);
 	}
@@ -146,6 +147,8 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 	 * @see TransactionAttributeEditor
 	 * @see NameMatchTransactionAttributeSource
 	 */
+	//通过依赖注入的事务属性以Properties的形式出现
+	//把从Beandefination中读到的事务管理的属性信息注入到TransactionInterceptor中
 	public void setTransactionAttributes(Properties transactionAttributes) {
 		this.transactionInterceptor.setTransactionAttributes(transactionAttributes);
 	}
@@ -192,13 +195,17 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 	/**
 	 * Creates an advisor for this FactoryBean's TransactionInterceptor.
 	 */
+	//这里创建spring aop对事务处理的Advisor
 	@Override
 	protected Object createMainInterceptor() {
 		this.transactionInterceptor.afterPropertiesSet();
 		if (this.pointcut != null) {
+			//这里使用默认的增强器，并为增强器配置事务处理拦截器
 			return new DefaultPointcutAdvisor(this.pointcut, this.transactionInterceptor);
 		}
 		else {
+			//如果没有配置pointcut，使用TransactionAttributeSourceAdvisor作为增强器，并为增强器设置
+			//transactionInterceptor作为拦截器
 			// Rely on default pointcut.
 			return new TransactionAttributeSourceAdvisor(this.transactionInterceptor);
 		}
