@@ -71,6 +71,7 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 	 * @see #setNameMap
 	 * @see TransactionAttributeEditor
 	 */
+	//设置配置的事务方法
 	public void setProperties(Properties transactionAttributes) {
 		TransactionAttributeEditor tae = new TransactionAttributeEditor();
 		Enumeration<?> propNames = transactionAttributes.propertyNames();
@@ -100,15 +101,16 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 
 	@Override
 	@Nullable
+	//对调用的方法进行判断，判断他是否是事务方法，如果是事务方法，那么取出相应的事务配置属性
 	public TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass) {
 		if (!ClassUtils.isUserLevelMethod(method)) {
 			return null;
 		}
 
-		// Look for direct name match.
+		// Look for direct name match.判断当前目标调用的方法与配置的事务方法是否直接匹配
 		String methodName = method.getName();
 		TransactionAttribute attr = this.nameMap.get(methodName);
-
+		//如果不能匹配，通过PatternMatchUtils.simpleMatch方法来匹配
 		if (attr == null) {
 			// Look for most specific name match.
 			String bestNameMatch = null;

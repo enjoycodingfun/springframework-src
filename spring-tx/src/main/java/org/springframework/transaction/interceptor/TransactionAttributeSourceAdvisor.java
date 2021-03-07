@@ -41,12 +41,14 @@ import org.springframework.util.Assert;
 public class TransactionAttributeSourceAdvisor extends AbstractPointcutAdvisor {
 
 	@Nullable
+	//与其他Advisor一样，同样需要定义AOP中用到的Interceptor和PointCut
 	private TransactionInterceptor transactionInterceptor;
-
+	//通过内部类定义PointCut
 	private final TransactionAttributeSourcePointcut pointcut = new TransactionAttributeSourcePointcut() {
 		@Override
 		@Nullable
 		protected TransactionAttributeSource getTransactionAttributeSource() {
+			//这里通过调用transactionInterceptor来得到事务的配置属性，在对Proxy的方法进行匹配调用时，会使用到这些配置属性
 			return (transactionInterceptor != null ? transactionInterceptor.getTransactionAttributeSource() : null);
 		}
 	};
