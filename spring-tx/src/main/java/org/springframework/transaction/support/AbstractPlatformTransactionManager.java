@@ -348,25 +348,30 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			// Use defaults if no transaction definition given.
 			definition = new DefaultTransactionDefinition();
 		}
-
+		//判断当前线程是否存在事务，判断依据为当前线程记录的链接不为空且连接中（connectionHolder）中的transactionActive属性不为空
 		if (isExistingTransaction(transaction)) {
 			// Existing transaction found -> check propagation behavior to find out how to behave.
+			//当前线程存在事务
 			return handleExistingTransaction(definition, transaction, debugEnabled);
 		}
 
 		// Check definition settings for new transaction.
+		//事务超时设置校验（不能小于-1）
 		if (definition.getTimeout() < TransactionDefinition.TIMEOUT_DEFAULT) {
 			throw new InvalidTimeoutException("Invalid transaction timeout", definition.getTimeout());
 		}
 
 		// No existing transaction found -> check propagation behavior to find out how to proceed.
+		//如果当前线程不存在事务， 但是propagationBehavior 却被声明为(PROPAGATION MANDATORY()-使用当前的事务，如果当前没有事务，就抛出异常) 抛出异常
 		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_MANDATORY) {
 			throw new IllegalTransactionStateException(
 					"No existing transaction found for transaction marked with propagation 'mandatory'");
 		}
+		//PROPAGATION_REQUIRED 、PROPAGATION_REQUIRES_NEW 、PROPAGATION_NESTED 都需要新建事务
 		else if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRED ||
 				definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW ||
 				definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) {
+			//空挂起
 			SuspendedResourcesHolder suspendedResources = suspend(null);
 			if (debugEnabled) {
 				logger.debug("Creating new transaction with name [" + definition.getName() + "]: " + definition);
@@ -375,7 +380,12 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
 				DefaultTransactionStatus status = newTransactionStatus(
 						definition, transaction, true, newSynchronization, debugEnabled, suspendedResources);
+				/*
+					＊ 构造transaction ，包括设置connectionHolder、隔离级别、timout，这里不是spring设置的而是委托给底层的数据库连接
+					＊ 如果是新连接,绑定到当前线程
+				*/
 				doBegin(transaction, definition);
+				//新同步事务的设置，针对当前线程的设置
 				prepareSynchronization(status, definition);
 				return status;
 			}
