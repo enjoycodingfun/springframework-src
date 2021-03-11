@@ -131,6 +131,7 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 	public void rollbackToSavepoint(Object savepoint) throws TransactionException {
 		ConnectionHolder conHolder = getConnectionHolderForSavepoint();
 		try {
+			//最终还是通过jdbc的回滚去完成业务回滚的
 			conHolder.getConnection().rollback((Savepoint) savepoint);
 			conHolder.resetRollbackOnly();
 		}
