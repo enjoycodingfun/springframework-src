@@ -329,6 +329,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			logger.debug("Committing JDBC transaction on Connection [" + con + "]");
 		}
 		try {
+			//提交也是通过底层的接口去做的
 			con.commit();
 		}
 		catch (SQLException ex) {
