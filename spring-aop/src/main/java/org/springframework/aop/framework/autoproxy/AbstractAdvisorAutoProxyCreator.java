@@ -92,6 +92,10 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
 		//获取增强器
+		/*
+		对于指定bean的增强方法的获取一定是包含两个步骤的，获取所有的增强及寻找所有增强中适用于bean的增强并应用，下面两个方法便做了这
+		两件事
+		 */
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 		extendAdvisors(eligibleAdvisors);
